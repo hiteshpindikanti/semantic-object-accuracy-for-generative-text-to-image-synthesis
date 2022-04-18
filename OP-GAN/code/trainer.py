@@ -588,6 +588,7 @@ class condGANTrainer(object):
 
                 imgs, captions, cap_lens, class_ids, keys, transformation_matrices, label_one_hot, _ = prepare_data(
                     data, eval=True)
+                logger.info(f"Captions [{captions.shape}]: {captions.data.cpu().numpy()}")
 
 
                 transf_matrices = transformation_matrices[0]
