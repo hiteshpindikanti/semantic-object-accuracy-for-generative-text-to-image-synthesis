@@ -624,8 +624,8 @@ class condGANTrainer(object):
                 with torch.no_grad():
                     fake_imgs, _, mu, logvar = netG(*inputs)
                 for batch_idx, j in enumerate(range(batch_size)):
-                    s_tmp = '%s/%s' % (save_dir, keys[j])
-                    folder = s_tmp[:s_tmp.rfind('/')]+"/images"
+                    s_tmp = '%s/images/%s' % (save_dir, keys[j])
+                    folder = s_tmp[:s_tmp.rfind('/')]
                     if not os.path.isdir(folder):
                         logger.info('Make a new folder: %s', folder)
                         mkdir_p(folder)
