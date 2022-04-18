@@ -224,7 +224,7 @@ class condGANTrainer(object):
                 checkpoint_list = checkpoint_list[1:]
 
             ckpt_tmp = len(checkpoint_list_tmp)
-            for idx in range(ckpt_tmp-1):
+            for idx in range(ckpt_tmp - 1):
                 os.remove(checkpoint_list_tmp[idx])
 
     def set_requires_grad_value(self, models_list, brequires):
@@ -287,7 +287,8 @@ class condGANTrainer(object):
             for batch_size in batch_sizes:
                 noise.append(Variable(torch.FloatTensor(batch_size, cfg.GAN.GLOBAL_Z_DIM)).to(cfg.DEVICE))
                 local_noise.append(Variable(torch.FloatTensor(batch_size, cfg.GAN.LOCAL_Z_DIM)).to(cfg.DEVICE))
-                fixed_noise.append(Variable(torch.FloatTensor(batch_size, cfg.GAN.GLOBAL_Z_DIM).normal_(0, 1)).to(cfg.DEVICE))
+                fixed_noise.append(
+                    Variable(torch.FloatTensor(batch_size, cfg.GAN.GLOBAL_Z_DIM).normal_(0, 1)).to(cfg.DEVICE))
         else:
             batch_size = self.batch_size[0]
             noise = Variable(torch.FloatTensor(batch_size, cfg.GAN.GLOBAL_Z_DIM)).to(cfg.DEVICE)
@@ -435,13 +436,13 @@ class condGANTrainer(object):
                                               words_embs, mask, image_encoder,
                                               captions, cap_lens, epoch, transf_matrices_inv,
                                               label_one_hot, local_noise[subset_idx], transf_matrices,
-                                          max_objects, subset_idx, name='average')
+                                              max_objects, subset_idx, name='average')
                     else:
                         self.save_img_results(netG, fixed_noise, sent_emb,
-                                          words_embs, mask, image_encoder,
-                                          captions, cap_lens, epoch, transf_matrices_inv,
-                                          label_one_hot, local_noise, transf_matrices,
-                                          max_objects, None, name='average')
+                                              words_embs, mask, image_encoder,
+                                              captions, cap_lens, epoch, transf_matrices_inv,
+                                              label_one_hot, local_noise, transf_matrices,
+                                              max_objects, None, name='average')
                     load_params(netG, backup_para)
 
             self.save_model(netG, avg_param_G, netsD, optimizerG, optimizersD, epoch)
@@ -516,7 +517,9 @@ class condGANTrainer(object):
                 ######################################################
                 noise.data.normal_(0, 1)
                 local_noise.data.normal_(0, 1)
-                inputs = (noise, local_noise, sent_emb, words_embs, mask, transf_matrices, transf_matrices_inv, label_one_hot, max_objects)
+                inputs = (
+                noise, local_noise, sent_emb, words_embs, mask, transf_matrices, transf_matrices_inv, label_one_hot,
+                max_objects)
                 inputs = tuple((inp.to(cfg.DEVICE) if isinstance(inp, torch.Tensor) else inp) for inp in inputs)
 
                 with torch.no_grad():
@@ -535,7 +538,7 @@ class condGANTrainer(object):
                     im = im.astype(np.uint8)
                     im = np.transpose(im, (1, 2, 0))
                     im = Image.fromarray(im)
-                    fullpath = '%s_s%d.png' % (s_tmp, step*batch_size+batch_idx)
+                    fullpath = '%s_s%d.png' % (s_tmp, step * batch_size + batch_idx)
                     im.save(fullpath)
 
     def generate(self, split_dir, num_samples=30000):
@@ -582,13 +585,15 @@ class condGANTrainer(object):
                 number_batches = 1
 
             data_iter = iter(self.data_loader)
+            word_mapping = np.empty(len(self.ixtoword), dtype=str)
+            for key, val in self.ixtoword.items():
+                word_mapping[key] = val
 
             for step in tqdm(range(number_batches)):
                 data = data_iter.next()
 
                 imgs, captions, cap_lens, class_ids, keys, transformation_matrices, label_one_hot, _ = prepare_data(
                     data, eval=True)
-                logger.info(f"Captions [{captions.shape}]: {' '.join(map(lambda x: self.ixtoword[x], captions[0].data.cpu().numpy().astype(int)))}")
 
                 transf_matrices = transformation_matrices[0]
                 transf_matrices_inv = transformation_matrices[1]
@@ -608,14 +613,19 @@ class condGANTrainer(object):
                 ######################################################
                 noise.data.normal_(0, 1)
                 local_noise.data.normal_(0, 1)
-                inputs = (noise, local_noise, sent_emb, words_embs, mask, transf_matrices, transf_matrices_inv, label_one_hot, max_objects)
+                inputs = (
+                noise, local_noise, sent_emb, words_embs, mask, transf_matrices, transf_matrices_inv, label_one_hot,
+                max_objects)
                 inputs = tuple((inp.to(cfg.DEVICE) if isinstance(inp, torch.Tensor) else inp) for inp in inputs)
+
+                fullpath_noise = f"{save_dir}_noise.npy"
+                fullpath_caption = f"{save_dir}_captions.txt"
 
                 with torch.no_grad():
                     fake_imgs, _, mu, logvar = netG(*inputs)
                 for batch_idx, j in enumerate(range(batch_size)):
                     s_tmp = '%s/%s' % (save_dir, keys[j])
-                    folder = s_tmp[:s_tmp.rfind('/')]
+                    folder = s_tmp[:s_tmp.rfind('/')]+"/images"
                     if not os.path.isdir(folder):
                         logger.info('Make a new folder: %s', folder)
                         mkdir_p(folder)
@@ -627,12 +637,9 @@ class condGANTrainer(object):
                     im = im.astype(np.uint8)
                     im = np.transpose(im, (1, 2, 0))
                     im = Image.fromarray(im)
-                    fullpath_generated_image = '%s_s%d.png' % (s_tmp, step*batch_size+batch_idx)
-                    fullpath_noise = f"{s_tmp}_s{step*batch_size+batch_idx}_noise.txt"
-                    fullpath_caption = f"{s_tmp}_s{step*batch_size+batch_idx}_caption.txt"
+                    fullpath_generated_image = '%s_s%d.png' % (s_tmp, step * batch_size + batch_idx)
                     im.save(fullpath_generated_image)
-                    np.savetxt(fullpath_noise, local_noise[j].data.cpu().numpy())
-                    with open(fullpath_caption, 'w') as caption_file:
-                        caption_file.write(' '.join(map(lambda x: self.ixtoword[x],
-                                                        captions[j].data.cpu().numpy().astype(int))))
 
+                np.save(fullpath_noise, local_noise.data.cpu().numpy().repeat(batch_size, axis=0))
+                with open(fullpath_caption, 'w') as caption_file:
+                    caption_file.write('\n'.join(map(lambda x: ' '.join(x), word_mapping[captions.data.cpu().numpy().astype(int)])))
