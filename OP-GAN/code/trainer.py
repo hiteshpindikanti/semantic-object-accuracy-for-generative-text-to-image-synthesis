@@ -618,13 +618,13 @@ class condGANTrainer(object):
                 max_objects)
                 inputs = tuple((inp.to(cfg.DEVICE) if isinstance(inp, torch.Tensor) else inp) for inp in inputs)
 
-                fullpath_noise = f"{save_dir}/noise.npy"
-                fullpath_caption = f"{save_dir}/captions.txt"
+                fullpath_noise = f"{save_dir}/OPGAN_COCO_noise.npy"
+                fullpath_caption = f"{save_dir}/OPGAN_COCO_captions.txt"
 
                 with torch.no_grad():
                     fake_imgs, _, mu, logvar = netG(*inputs)
                 for batch_idx, j in enumerate(range(batch_size)):
-                    s_tmp = '%s/images/%s' % (save_dir, keys[j])
+                    s_tmp = '%s/images/OPGAN_COCO_gen_%s' % (save_dir, keys[j])
                     folder = s_tmp[:s_tmp.rfind('/')]
                     if not os.path.isdir(folder):
                         logger.info('Make a new folder: %s', folder)
