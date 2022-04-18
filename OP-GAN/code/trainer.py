@@ -588,7 +588,7 @@ class condGANTrainer(object):
 
                 imgs, captions, cap_lens, class_ids, keys, transformation_matrices, label_one_hot, _ = prepare_data(
                     data, eval=True)
-                logger.info(f"Captions [{captions.shape}]: {' '.join(np.map(lambda x: self.ixtoword[x], captions[0].data.cpu().numpy().astype(int)))}")
+                logger.info(f"Captions [{captions.shape}]: {' '.join(map(lambda x: self.ixtoword[x], captions[0].data.cpu().numpy().astype(int)))}")
 
                 transf_matrices = transformation_matrices[0]
                 transf_matrices_inv = transformation_matrices[1]
@@ -632,7 +632,7 @@ class condGANTrainer(object):
                     fullpath_caption = f"{s_tmp}_s{step*batch_size+batch_idx}_caption.txt"
                     im.save(fullpath_generated_image)
                     np.savetxt(fullpath_noise, local_noise[j].data.cpu().numpy())
-                    np.savetxt(fullpath_caption, np.map(lambda x: self.ixtoword[x],
-                                                        captions[j].data.cpu().numpy().astype(int)),
+                    np.savetxt(fullpath_caption, np.array(map(lambda x: self.ixtoword[x],
+                                                        captions[j].data.cpu().numpy().astype(int))),
                                delimiter=" ", fmt="%s")
 
