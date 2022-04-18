@@ -585,7 +585,7 @@ class condGANTrainer(object):
                 number_batches = 1
 
             data_iter = iter(self.data_loader)
-            word_mapping = np.empty(len(self.ixtoword), dtype=str)
+            word_mapping = np.empty(len(self.ixtoword), dtype='<U100')
             for key, val in self.ixtoword.items():
                 word_mapping[key] = val
 
@@ -618,8 +618,8 @@ class condGANTrainer(object):
                 max_objects)
                 inputs = tuple((inp.to(cfg.DEVICE) if isinstance(inp, torch.Tensor) else inp) for inp in inputs)
 
-                fullpath_noise = f"{save_dir}_noise.npy"
-                fullpath_caption = f"{save_dir}_captions.txt"
+                fullpath_noise = f"{save_dir}/noise.npy"
+                fullpath_caption = f"{save_dir}/captions.txt"
 
                 with torch.no_grad():
                     fake_imgs, _, mu, logvar = netG(*inputs)
