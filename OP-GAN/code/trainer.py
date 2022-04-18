@@ -632,7 +632,7 @@ class condGANTrainer(object):
                     fullpath_caption = f"{s_tmp}_s{step*batch_size+batch_idx}_caption.txt"
                     im.save(fullpath_generated_image)
                     np.savetxt(fullpath_noise, local_noise[j].data.cpu().numpy())
-                    np.savetxt(fullpath_caption, np.array(map(lambda x: self.ixtoword[x],
-                                                        captions[j].data.cpu().numpy().astype(int))),
-                               delimiter=" ", fmt="%s")
+                    with open(fullpath_caption, 'w') as caption_file:
+                        caption_file.write(' '.join(map(lambda x: self.ixtoword[x],
+                                                        captions[j].data.cpu().numpy().astype(int))))
 
