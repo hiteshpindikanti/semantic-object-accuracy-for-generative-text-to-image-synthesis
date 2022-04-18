@@ -11,7 +11,7 @@ TRAIN:
     FLAG: False
     NET_G: 'models/op-gan.pth'
     B_NET_D: False
-    BATCH_SIZE: [50]
+    BATCH_SIZE: [10]
     NET_E: 'models/coco/text_encoder100.pth'
     OPTIMIZE_DATA_LOADING: False
     GENERATED_BBOXES: True

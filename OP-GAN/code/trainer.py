@@ -589,6 +589,7 @@ class condGANTrainer(object):
                 imgs, captions, cap_lens, class_ids, keys, transformation_matrices, label_one_hot, _ = prepare_data(
                     data, eval=True)
 
+
                 transf_matrices = transformation_matrices[0]
                 transf_matrices_inv = transformation_matrices[1]
 
@@ -626,5 +627,10 @@ class condGANTrainer(object):
                     im = im.astype(np.uint8)
                     im = np.transpose(im, (1, 2, 0))
                     im = Image.fromarray(im)
-                    fullpath = '%s_s%d.png' % (s_tmp, step*batch_size+batch_idx)
-                    im.save(fullpath)
+                    fullpath_generated_image = '%s_s%d.png' % (s_tmp, step*batch_size+batch_idx)
+                    fullpath_noise = f"{s_tmp}_s{step*batch_size+batch_idx}_noise.txt"
+                    fullpath_caption = f"{s_tmp}_s{step*batch_size+batch_idx}_caption.txt"
+                    im.save(fullpath_generated_image)
+                    np.savetxt(fullpath_noise, local_noise[j].data.cpu().numpy())
+                    np.savetxt(fullpath_caption, captions[j].data.cpu().numpy())
+
